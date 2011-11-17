@@ -32,7 +32,7 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
  
 	#Recorre los el path
 	parents = {}
-        for dir, dirs, files in os.walk('./'):
+        for dir, dirs, files in os.walk('~/.local/share/gedit/plugins'):
             for subdir in dirs:
                 parents[os.path.join(dir, subdir)] = treestore.append(parents.get(dir, None), [Gtk.STOCK_FILE, subdir, "dir", 0])
             for item in files:
