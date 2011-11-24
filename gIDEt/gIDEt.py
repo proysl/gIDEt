@@ -1,9 +1,11 @@
 from gi.repository import GObject, Gtk, Gedit
 import os
+from IconAssignment import *
 
 class GIDEt(GObject.Object, Gedit.WindowActivatable):
     __gtype_name__ = "gIDEt"
     window = GObject.property(type=Gedit.Window)
+    iconAssignment = IconAssignment()
     
     def __init__(self):
         GObject.Object.__init__(self)
@@ -34,9 +36,10 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
 	parents = {}
         for dir, dirs, files in os.walk('./'):
             for subdir in dirs:
-                parents[os.path.join(dir, subdir)] = treestore.append(parents.get(dir, None), [Gtk.STOCK_FILE, subdir, "dir", 0])
+                parents[os.path.join(dir, subdir)] = treestore.append(parents.get(dir, None), [Gtk.STOCK_OPEN, subdir, "dir", 0])
             for item in files:
-                treestore.append(parents.get(dir, None), [Gtk.STOCK_FILE, item, "uri", 0])
+                treestore.append(parents.get(dir, None), [self.iconAssignment.getIconFromFile(item), item, "uri", 0])
+
 
         # create the treeview
         self._treeview = Gtk.TreeView.new_with_model(treestore)
@@ -65,7 +68,6 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
 
     def do_deactivate(self):
         panel = self.window.get_side_panel()
-        panel.remove_item(self._side_widget)
 
     def do_update_state(self):
         pass
