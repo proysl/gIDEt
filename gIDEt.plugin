@@ -3,9 +3,8 @@ Loader=python
 Module=gIDEt
 IAge=3
 Name=gIDEt
-Description=Give Gedit a more IDE look.
+Description=Give Gedit a more IDE behaviour.
 Authors=Nahuel Garbezza <n.garbezza@gmail.com>, Ronny de Jesus <nnydejesus@gmail.com>, Alan Rodas Bonjour <alanrodas@gmail.com>
 Copyright=Copyright © 2011 Kings Of Procrastination
-Website=http://sasa.com
+Website=https://github.com/proysl/gIDEt
 Version=0.0.1
-
