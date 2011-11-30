@@ -1,6 +1,5 @@
-from gi.repository import GObject, Gtk, Gedit
-import gio
-from Workspace import Workspace
+from gi.repository import GObject, Gtk, Gedit, Gio
+import projects
 
 class GIDEt(GObject.Object, Gedit.WindowActivatable):
     
@@ -11,7 +10,6 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
         GObject.Object.__init__(self)
         
     def do_activate(self):
-        self._workspace = Workspace()
         
         icon = Gtk.Image.new_from_stock(Gtk.STOCK_YES, Gtk.IconSize.MENU)
         panel = self.window.get_side_panel()
@@ -28,7 +26,7 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
         column.pack_start(cell, True)
         column.add_attribute(cell, "text", 1)
         
-        self._treeview = Gtk.TreeView.new_with_model(self._workspace.get_treestore())
+        self._treeview = Gtk.TreeView.new_with_model(self.get_tree_store())
         
         self._treeview.set_tooltip_column(2)
         self._treeview.append_column(column)
@@ -56,8 +54,24 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
     
     ### PRIVATE ###
     
+    def get_tree_store(self):
+        tree_store = Gtk.TreeStore(GObject.TYPE_STRING,    # icon
+                                        GObject.TYPE_STRING,    # name
+                                        GObject.TYPE_STRING)    # uri
+        for project in projects.all_projects():
+            tree_store.append( None, [project.icon, project.name, project.uri] )
+        return tree_store
+            
     def _open_selected_file(self, treeview, path, tree_column):
         (model, treeiter) = treeview.get_selection().get_selected()
-        print model.get_value(treeiter, 1)
+        uri = model.get_value(treeiter, 2)
+        print (uri)
+        location = Gio.file_new_for_uri(uri)
+        print location
+        tab = self.window.get_tab_from_location(location)
+        if tab:
+            self.window.set_active_tab(tab)
+        else:
+            self.window.create_tab_from_location(location, None, 0, 0, False, True)
         # TODO abrir archivo
-        # Gedit.Document.load(model.get_value(treeiter, 1))
+        # Gedit.Document.load(gio.File(model.get_value(treeiter, 1)))

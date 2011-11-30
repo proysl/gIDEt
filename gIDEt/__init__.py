@@ -1,1 +1,1 @@
-from gIDEt import GIDEt
+from gidet import GIDEt
