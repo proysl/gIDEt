@@ -1,5 +1,7 @@
 from gi.repository import GObject, Gtk, Gedit, Gio
 import projects
+import os
+import iconmanager
 
 class GIDEt(GObject.Object, Gedit.WindowActivatable):
     
@@ -58,20 +60,41 @@ class GIDEt(GObject.Object, Gedit.WindowActivatable):
         tree_store = Gtk.TreeStore(GObject.TYPE_STRING,    # icon
                                         GObject.TYPE_STRING,    # name
                                         GObject.TYPE_STRING)    # uri
-        for project in projects.all_projects():
-            tree_store.append( None, [project.icon, project.name, project.uri] )
+        for project in projects.all_projects2():
+            project_tree =  tree_store.append( None,  \
+                [project.icon, project.name, project.uri] )
+
+            self.add_nodes_to_project(project.uri, tree_store, project_tree)
         return tree_store
+
+#TODO se puede llegar hacer que el proyecto conozca sus packages y ellos 
+#los files, pero no lo llegue hacer
+    def add_nodes_to_project(self, uri, tree_store, project_tree):
+        parents = {}
+        for dir, dirs, files in os.walk(uri):
+            for subdir in dirs:
+                parents[os.path.join(dir, subdir)] =  \
+                    tree_store.append(parents.get(dir, project_tree), \
+                        [iconmanager.get_package_icon(), subdir, "dir"])
+
+            for item in files:
+                tree_store.append(parents.get(dir, project_tree),  \
+                    [iconmanager.get_file_icon(item), item,  \
+                        os.path.join(dir, item)])        
             
     def _open_selected_file(self, treeview, path, tree_column):
         (model, treeiter) = treeview.get_selection().get_selected()
         uri = model.get_value(treeiter, 2)
-        print (uri)
-        location = Gio.file_new_for_uri(uri)
-        print location
-        tab = self.window.get_tab_from_location(location)
-        if tab:
-            self.window.set_active_tab(tab)
-        else:
-            self.window.create_tab_from_location(location, None, 0, 0, False, True)
+
+        if(os.path.isfile(uri)):
+            location  = Gio.file_new_for_uri(uri)
+            tab = self.window.get_tab_from_location(location)
+            if tab:
+                self.window.set_active_tab(tab)
+            else:
+                self.window.create_tab_from_uri(uri, None, 0, 0, False, True)
+
+        print "uri " + str(uri)
+
         # TODO abrir archivo
         # Gedit.Document.load(gio.File(model.get_value(treeiter, 1)))

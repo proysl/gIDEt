@@ -9,8 +9,10 @@ LANGUAGE_SECTION = "language"
 PROJECT_NAME_OPTION = "name"
 PROJECT_LANGUAGE_OPTION = "language"
 GIDET_PROJECT_CONF_FILE = ".project"
+WORKSPACE_CONF_FILE = ".workspace"
 
 workspace_uri = DEFAULT_WORKSPACE_PATH
+
 
 class Project:
     
@@ -25,20 +27,28 @@ class Project:
         # Java Class, Java Interface, Python class, Python empty module, Django class and so on
         
 def new_project(project_name, language, workspace_uri):
-    full_uri = os.path.join(project, project_name)
+    full_uri = os.path.join(workspace_uri, project_name)
     # create directory and .project file with its data
     os.mkdir(full_uri)
-    config_file = configparser.ConfigParser().readfp(project_file)
+    os.chdir(full_uri)
+    project_file = open(GIDET_PROJECT_CONF_FILE, "wr")
+    config_file = configparser.ConfigParser()
     config_file.add_section(PROJECT_SECTION)
     config_file.set(PROJECT_SECTION, PROJECT_NAME_OPTION, project_name)
     config_file.add_section(LANGUAGE_SECTION)
     config_file.set(LANGUAGE_SECTION, PROJECT_LANGUAGE_OPTION, language)
-    project_file = open(os.path.join(full_uri, GIDET_PROJECT_CONF_FILE), "w")
-    config.write(project_file)
+    config_file.write(project_file)
     project_file.close()
+
+    #guarda en la configuracion del worksace, la referencia al nuevo projecto
+    os.chdir(DEFAULT_WORKSPACE_PATH)
+    workspace_config_file = open(WORKSPACE_CONF_FILE, "a+b")
+    workspace_config_file.write(full_uri + "\n")
+    workspace_config_file.close 
+
     # create the project object and return it
     return Project(full_uri, project_name, language)
-    
+
 def load_project_from_file(full_uri):
     project_file = open(os.path.join(full_uri, GIDET_PROJECT_CONF_FILE), "r")
     config_file = configparser.ConfigParser()
@@ -52,6 +62,27 @@ def contains_project(uri):
     return any(file_name == GIDET_PROJECT_CONF_FILE \
             for file_name in os.listdir(uri))
 
+
+
+def all_projects2():
+    os.chdir(DEFAULT_WORKSPACE_PATH)
+    config = open(WORKSPACE_CONF_FILE, "r")
+
+    projects = [load_project_from_file(project_dir) \
+            for project_dir \
+            in [path_project[:-1] \
+                for path_project \
+                in config.readlines() \
+                if isdir(path_project)]
+            if contains_project(project_dir)]
+
+    config.close()
+    return projects
+
+def isdir(path):
+    return os.path.isdir(path[:-1])
+
+
 def all_projects():
     return [load_project_from_file(project_dir) \
             for project_dir \
@@ -60,3 +91,12 @@ def all_projects():
                 in os.listdir(workspace_uri) \
                 if os.path.isdir(os.path.join(workspace_uri, subdir))]
             if contains_project(project_dir)]
+
+#import projects
+#p = projects.new_project("testProject", "java", "/home/nny/Dropbox/PenDrive/#plugins/gedit/plugins/gIDEt/")
+
+#import projects
+#projects.all_projects2()
+
+#os.path.join("~/Dropbox/PenDrive/plugins/gedit/plugins/gIDEt/workspace/", "lala")
+
