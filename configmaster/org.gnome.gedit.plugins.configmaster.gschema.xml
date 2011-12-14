@@ -1,6 +1,35 @@
 <schemalist>
 
   <schema id="org.gnome.gedit.plugins.configmaster">
+    <child schema="org.gnome.gedit.plugins.configmaster.preferences" name="preferences"/>
+    <child schema="org.gnome.gedit.plugins.configmaster.plugins" name="plugins"/>
+  </schema>
+
+  <schema id="org.gnome.gedit.plugins.configmaster.preferences">
+    <child schema="org.gnome.gedit.plugins.configmaster.preferences.editor" name="editor"/>
+    <child schema="org.gnome.gedit.plugins.configmaster.preferences.ui" name="ui"/>
+  </schema>
+
+  <schema id="org.gnome.gedit.plugins.configmaster.preferences.editor">
+    <key type="s" name="editor-font">
+      <default>'Monospace 12'</default>
+    </key>
+
+    <key type="s" name="scheme">
+      <default>'classic'</default>
+    </key>
+
+    <key type="b" name="create-backup-copy">
+      <default>true</default>
+    </key>
+
+    <key type="b" name="auto-save">
+      <default>false</default>
+    </key>
+
+    <key type="u" name="auto-save-interval">
+      <default>10</default>
+    </key>
 
     <key type="u" name="tabs-size">
       <default>8</default>
@@ -10,6 +39,57 @@
       <default>false</default>
     </key>
 
+    <key type="b" name="auto-indent">
+      <default>false</default>
+    </key>
+
+    <key type="b" name="display-line-numbers">
+      <default>false</default>
+    </key>
+
+    <key type="b" name="highlight-current-line">
+      <default>false</default>
+    </key>
+
+    <key type="b" name="bracket-matching">
+      <default>false</default>
+    </key>
+
+    <key type="b" name="display-right-margin">
+      <default>false</default>
+    </key>
+
+    <key type="u" name="right-margin-position">
+      <default>80</default>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.gedit.plugins.configmaster.preferences.ui">
+    <key type="b" name="toolbar-visible">
+      <default>true</default>
+    </key>
+
+    <key type="b" name="statusbar-visible">
+      <default>true</default>
+    </key>
+
+    <key type="b" name="side-panel-visible">
+      <default>false</default>
+    </key>
+
+    <key type="b" name="bottom-panel-visible">
+      <default>false</default>
+    </key>
+
+    <key type="u" name="max-recents">
+      <default>5</default>
+    </key>
+  </schema>
+
+  <schema id="org.gnome.gedit.plugins.configmaster.plugins">
+    <key type="as" name="active-plugins">
+      <default>['docinfo', 'modelines', 'filebrowser', 'spell', 'time']</default>
+    </key>
   </schema>
 
 </schemalist>

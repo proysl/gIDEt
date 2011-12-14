@@ -6,7 +6,10 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
 
     window = GObject.property(type=Gedit.Window)
 
-    GSCHEMA_ID = 'org.gnome.gedit.plugins.configmaster'
+    GSCHEMA_ID_BASE = 'org.gnome.gedit.plugins.configmaster'
+    GSCHEMA_ID_PLUGINS = GSCHEMA_ID_BASE + '.plugins'
+    GSCHEMA_ID_PREFS_EDITOR = GSCHEMA_ID_BASE + '.preferences.editor'
+    GSCHEMA_ID_PREFS_UI = GSCHEMA_ID_BASE + '.preferences.ui'
 
     UI_XML = """<ui>
 <menubar name="MenuBar">
@@ -20,6 +23,96 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
     </menu>
 </menubar>
 </ui>"""
+
+    TYPE_STRING = 'string'
+    TYPE_BOOLEAN = 'boolean'
+    TYPE_UINT = 'uint'
+    TYPE_LIST_STRING = 'strv'
+
+    # plugins
+    OPT_ACTIVE_PLUGINS = ('active-plugins', TYPE_LIST_STRING)
+
+    # preferences-editor
+    OPT_EDITOR_FONT = ('editor-font', TYPE_STRING)
+    OPT_SCHEME = ('scheme', TYPE_STRING)
+    OPT_CREATE_BACKUP_COPY = ('create-backup-copy', TYPE_BOOLEAN)
+    OPT_AUTO_SAVE = ('auto-save', TYPE_BOOLEAN)
+    OPT_AUTO_SAVE_INTERVAL = ('auto-save-interval', TYPE_UINT)
+    OPT_TABS_SIZE = ('tabs-size', TYPE_UINT)
+    OPT_INSERT_SPACES = ('insert-spaces', TYPE_BOOLEAN)
+    OPT_AUTO_INDENT = ('auto-indent', TYPE_BOOLEAN)
+    OPT_DISPLAY_LINE_NUMBERS = ('display-line-numbers', TYPE_BOOLEAN)
+    OPT_HIGHLIGHT_CURRENT_LINE = ('highlight-current-line', TYPE_BOOLEAN)
+    OPT_BRACKET_MATCHING = ('bracket-matching', TYPE_BOOLEAN)
+    OPT_DISPLAY_RIGHT_MARGIN = ('display-right-margin', TYPE_BOOLEAN)
+    OPT_RIGHT_MARGIN_POSITION = ('right-margin-position', TYPE_UINT)
+
+    # preferences-ui
+    OPT_TOOLBAR_VISIBLE = ('toolbar-visible', TYPE_BOOLEAN)
+    OPT_STATUSBAR_VISIBLE = ('statusbar-visible', TYPE_BOOLEAN)
+    OPT_SIDE_PANEL_VISIBLE = ('side-panel-visible', TYPE_BOOLEAN)
+    OPT_BOTTOM_PANEL_VISIBLE = ('bottom-panel-visible', TYPE_BOOLEAN)
+    OPT_MAX_RECENTS = ('max-recents', TYPE_UINT)
+
+    RUBY_CONFIG = {
+      'plugins' : {
+        OPT_ACTIVE_PLUGINS : ['docinfo', 'modelines', 'filebrowser', 'spell', 'time']
+      },
+      'preferences' : {
+        'editor' : {
+          OPT_EDITOR_FONT : 'Monospace 9',
+          OPT_SCHEME : 'cobalt',
+          OPT_CREATE_BACKUP_COPY : True,
+          OPT_AUTO_SAVE : True,
+          OPT_AUTO_SAVE_INTERVAL : 15,
+          OPT_TABS_SIZE : 2,
+          OPT_INSERT_SPACES : True,
+          OPT_AUTO_INDENT : True,
+          OPT_DISPLAY_LINE_NUMBERS : True,
+          OPT_HIGHLIGHT_CURRENT_LINE : True,
+          OPT_BRACKET_MATCHING : False,
+          OPT_DISPLAY_RIGHT_MARGIN : True,
+          OPT_RIGHT_MARGIN_POSITION : 72
+        },
+        'ui' : {
+          OPT_TOOLBAR_VISIBLE : True,
+          OPT_STATUSBAR_VISIBLE : True,
+          OPT_SIDE_PANEL_VISIBLE : True,
+          OPT_BOTTOM_PANEL_VISIBLE : False,
+          OPT_MAX_RECENTS : 10
+        }
+      }
+    }
+
+    PYTHON_CONFIG = {
+      'plugins' : {
+        OPT_ACTIVE_PLUGINS : ['docinfo', 'modelines', 'filebrowser', 'spell', 'time']
+      },
+      'preferences' : {
+        'editor' : {
+          OPT_EDITOR_FONT : 'Monospace 12',
+          OPT_SCHEME : 'classic',
+          OPT_CREATE_BACKUP_COPY : True,
+          OPT_AUTO_SAVE : True,
+          OPT_AUTO_SAVE_INTERVAL : 10,
+          OPT_TABS_SIZE : 4,
+          OPT_INSERT_SPACES : False,
+          OPT_AUTO_INDENT : True,
+          OPT_DISPLAY_LINE_NUMBERS : True,
+          OPT_HIGHLIGHT_CURRENT_LINE : False,
+          OPT_BRACKET_MATCHING : False,
+          OPT_DISPLAY_RIGHT_MARGIN : True,
+          OPT_RIGHT_MARGIN_POSITION : 80
+        },
+        'ui' : {
+          OPT_TOOLBAR_VISIBLE : True,
+          OPT_STATUSBAR_VISIBLE : True,
+          OPT_SIDE_PANEL_VISIBLE : True,
+          OPT_BOTTOM_PANEL_VISIBLE : True,
+          OPT_MAX_RECENTS : 5
+        }
+      }
+    }
 
     def __init__(self):
         GObject.Object.__init__(self)
@@ -39,23 +132,44 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
     def _set_current_profile(self, name):
         """Given a profile named 'name', take its configuration parameters and
         store them in Gedit's current configuration."""
-        in_config = self._create_config_for(name)
-        out_config = self._create_gedit_conf()
-        out_config.set_uint('tabs-size', in_config.get_uint('tabs-size'))
-        out_config.set_boolean('insert-spaces', in_config.get_boolean('insert-spaces'))
+#        in_config = self._create_config_for(name)
+#        out_config = self._create_gedit_conf()
+#        out_config.set_uint('tabs-size', in_config.get_uint('tabs-size'))
+#        out_config.set_boolean('insert-spaces', in_config.get_boolean('insert-spaces'))
 
     def _load_default_configurations(self):
-        self._load_config('ruby', {'tabs-size' : 2, 'insert-spaces' : True})
-        self._load_config('python', {'tabs-size' : 4, 'insert-spaces' : False})
+        self._load_config('ruby', self.RUBY_CONFIG)
+        self._load_config('python', self.RUBY_CONFIG)
 
     def _load_config(self, conf_name, options):
-        config = self._create_config_for(conf_name)
-        config.set_uint('tabs-size', options['tabs-size'])
-        config.set_boolean('insert-spaces', options['insert-spaces'])
+        self._load_config_set( \
+          conf_name,
+          self.GSCHEMA_ID_PLUGINS,
+          options['plugins'],
+          '/plugins/')
+        self._load_config_set( \
+          conf_name,
+          self.GSCHEMA_ID_PREFS_EDITOR,
+          options['preferences']['editor'],
+          '/preferences/editor/')
+        self._load_config_set(
+          conf_name,
+          self.GSCHEMA_ID_PREFS_UI,
+          options['preferences']['ui'],
+          '/preferences/ui/')
 
-    def _create_config_for(self, name):
-        return Gio.Settings.new_with_path(self.GSCHEMA_ID, \
-            '/' + self.GSCHEMA_ID.replace('.', '/') + '/' + name + '/')
+    def _load_config_set(self, conf_name, gschema_id, options, path):
+        gsettings_conf = self._create_config(conf_name, gschema_id, path)
+        for key in options.keys():
+            conf_type = key[1]
+            setting_key = key[0]
+            getattr(gsettings_conf, 'set_' + conf_type)(setting_key, options[key])
+
+    def _create_config(self, name, gschema_id, path):
+        return Gio.Settings.new_with_path(gschema_id, self._to_path(name, path))
+
+    def _to_path(self, name, setting):
+        return '/' + self.GSCHEMA_ID_BASE.replace('.', '/') + '/' + name + setting
 
     def _create_gedit_conf(self):
         return Gio.Settings.new('org.gnome.gedit.preferences.editor')

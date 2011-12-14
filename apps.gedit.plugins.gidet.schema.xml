@@ -1,9 +1,0 @@
-<schemalist>
-  <schema id="apps.gedit.plugins.gidet.schema" path="/apps/gedit/plugins/gidet/">
-    <key type="s" name="workspace-path">
-      <default>''</default>
-      <summary>Default workspace path directory for gIDEt plugin</summary>
-      <description>xxxxx</description>
-    </key>
-  </schema>
-</schemalist>
