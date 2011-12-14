@@ -58,7 +58,7 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
 
     RUBY_CONFIG = {
       'plugins' : {
-        OPT_ACTIVE_PLUGINS : ['docinfo', 'modelines', 'filebrowser', 'spell', 'time']
+        OPT_ACTIVE_PLUGINS : ['configmaster', 'docinfo', 'modelines', 'filebrowser', 'spell', 'time']
       },
       'preferences' : {
         'editor' : {
@@ -88,7 +88,7 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
 
     PYTHON_CONFIG = {
       'plugins' : {
-        OPT_ACTIVE_PLUGINS : ['docinfo', 'modelines', 'filebrowser', 'spell', 'time']
+        OPT_ACTIVE_PLUGINS : ['configmaster', 'docinfo', 'modelines', 'filebrowser', 'spell', 'time']
       },
       'preferences' : {
         'editor' : {
@@ -151,7 +151,7 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
 
     def _load_default_configurations(self):
         self._load_config('ruby', self.RUBY_CONFIG)
-        self._load_config('python', self.RUBY_CONFIG)
+        self._load_config('python', self.PYTHON_CONFIG)
 
     def _load_config(self, conf_name, options):
         self._load_config_set( \
