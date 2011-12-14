@@ -1,0 +1,15 @@
+<schemalist>
+
+  <schema id="org.gnome.gedit.plugins.configmaster">
+
+    <key type="u" name="tabs-size">
+      <default>8</default>
+    </key>
+
+    <key type="b" name="insert-spaces">
+      <default>false</default>
+    </key>
+
+  </schema>
+
+</schemalist>

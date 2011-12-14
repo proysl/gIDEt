@@ -1,0 +1,1 @@
+from configmaster import ConfigMaster

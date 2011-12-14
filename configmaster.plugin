@@ -1,0 +1,10 @@
+[Plugin]
+Loader=python
+Module=configmaster
+IAge=3
+Name=ConfigMaster
+Description=Custom configurations and profiles.
+Authors=Nahuel Garbezza <n.garbezza@gmail.com>, Ronny de Jesus <nnydejesus@gmail.com>, Alan Rodas Bonjour <alanrodas@gmail.com>
+Copyright=Copyright © 2011 Kings Of Procrastination
+Website=https://github.com/proysl/gIDEt
+Version=0.0.1
