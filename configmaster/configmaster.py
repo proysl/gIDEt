@@ -54,6 +54,8 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
     OPT_BOTTOM_PANEL_VISIBLE = ('bottom-panel-visible', TYPE_BOOLEAN)
     OPT_MAX_RECENTS = ('max-recents', TYPE_UINT)
 
+    ALL_SETTINGS = [OPT_ACTIVE_PLUGINS, OPT_EDITOR_FONT, OPT_SCHEME, OPT_CREATE_BACKUP_COPY, OPT_AUTO_SAVE, OPT_AUTO_SAVE_INTERVAL, OPT_TABS_SIZE, OPT_INSERT_SPACES, OPT_AUTO_INDENT, OPT_DISPLAY_LINE_NUMBERS, OPT_HIGHLIGHT_CURRENT_LINE, OPT_BRACKET_MATCHING, OPT_DISPLAY_RIGHT_MARGIN, OPT_RIGHT_MARGIN_POSITION, OPT_TOOLBAR_VISIBLE, OPT_STATUSBAR_VISIBLE, OPT_SIDE_PANEL_VISIBLE, OPT_BOTTOM_PANEL_VISIBLE, OPT_MAX_RECENTS]
+
     RUBY_CONFIG = {
       'plugins' : {
         OPT_ACTIVE_PLUGINS : ['docinfo', 'modelines', 'filebrowser', 'spell', 'time']
@@ -132,10 +134,20 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
     def _set_current_profile(self, name):
         """Given a profile named 'name', take its configuration parameters and
         store them in Gedit's current configuration."""
-#        in_config = self._create_config_for(name)
-#        out_config = self._create_gedit_conf()
-#        out_config.set_uint('tabs-size', in_config.get_uint('tabs-size'))
-#        out_config.set_boolean('insert-spaces', in_config.get_boolean('insert-spaces'))
+        self._set_current_conf(name, self.GSCHEMA_ID_PLUGINS, '/plugins/', '.plugins')
+        self._set_current_conf(name, self.GSCHEMA_ID_PREFS_EDITOR, '/preferences/editor/', '.preferences.editor')
+        self._set_current_conf(name, self.GSCHEMA_ID_PREFS_UI, '/preferences/ui/', '.preferences.ui')
+
+    def _set_current_conf(self, conf_name, conf_schema, conf_path, gedit_schema):
+        in_config = self._create_config(conf_name, conf_schema, conf_path)
+        out_config = self._create_gedit_conf(gedit_schema)
+        for gsetting_key in in_config.keys():
+            setting_type = None
+            for setting in self.ALL_SETTINGS:
+                if setting[0] == gsetting_key:
+                    setting_type = setting[1]
+            # Python power, oh yeah!!
+            getattr(out_config, 'set_' + setting_type)(gsetting_key, getattr(in_config, 'get_' + setting_type)(gsetting_key))
 
     def _load_default_configurations(self):
         self._load_config('ruby', self.RUBY_CONFIG)
@@ -171,8 +183,8 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
     def _to_path(self, name, setting):
         return '/' + self.GSCHEMA_ID_BASE.replace('.', '/') + '/' + name + setting
 
-    def _create_gedit_conf(self):
-        return Gio.Settings.new('org.gnome.gedit.preferences.editor')
+    def _create_gedit_conf(self, schema):
+        return Gio.Settings.new('org.gnome.gedit' + schema)
 
     ### PRIVATE - UI ###
 
