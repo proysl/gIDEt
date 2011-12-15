@@ -82,15 +82,17 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
 
     def _add_ui(self):
         manager = self.window.get_ui_manager()
-        self._actions = Gtk.ActionGroup("Example04Actions")
+        act = Gtk.ActionGroup("ViewsMenuActions")
+        act.add_actions([('Views', None, 'ConfigMaster', None, "", None)])
+        manager.insert_action_group(act)
+        manager.ensure_update()
+        self._actions = Gtk.ActionGroup("ViewItemsActions")
         self._actions.add_actions([
             ('RubyConfig', Gtk.STOCK_INFO, "Choose _Ruby config",
-                None, "", self._config_selected)
-        ], 'ruby')
+                None, "", self._config_selected)], 'ruby')
         self._actions.add_actions([
             ('PythonConfig', Gtk.STOCK_INFO, "Choose _Python config",
-                None, "", self._config_selected)
-        ], 'python')
+                None, "", self._config_selected)], 'python')
         manager.insert_action_group(self._actions)
         self._ui_merge_id = manager.add_ui_from_string(UI_XML)
         manager.ensure_update()

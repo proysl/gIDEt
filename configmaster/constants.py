@@ -5,13 +5,9 @@ GSCHEMA_ID_PREFS_UI = GSCHEMA_ID_BASE + '.preferences.ui'
 
 UI_XML = """<ui>
   <menubar name="MenuBar">
-    <menu name="ToolsMenu" action="Tools">
-      <placeholder name="ToolsOps_3">
-        <menuitem name="RubyConfig" action="RubyConfig"/>
-      </placeholder>
-      <placeholder name="ToolsOps_4">
-        <menuitem name="PythonConfig" action="PythonConfig"/>
-      </placeholder>
+    <menu name="ViewsMenu" action="Views">
+      <menuitem name="RubyConfig" action="RubyConfig"/>
+      <menuitem name="PythonConfig" action="PythonConfig"/>
     </menu>
   </menubar>
 </ui>"""
