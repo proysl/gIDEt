@@ -26,11 +26,11 @@ class Project:
         # to get a list of templates for a project, like
         # Java Class, Java Interface, Python class, Python empty module, Django class and so on
         
-def new_project(project_name, language, workspace_uri):
-    full_uri = os.path.join(workspace_uri, project_name)
+def new_project(project_name, language, project_uri):
+#    full_uri = os.path.join(workspace_uri, project_name)
     # create directory and .project file with its data
-    os.mkdir(full_uri)
-    os.chdir(full_uri)
+    os.mkdir(project_uri)
+    os.chdir(project_uri)
     project_file = open(GIDET_PROJECT_CONF_FILE, "wr")
     config_file = configparser.ConfigParser()
     config_file.add_section(PROJECT_SECTION)
@@ -43,11 +43,11 @@ def new_project(project_name, language, workspace_uri):
     #guarda en la configuracion del worksace, la referencia al nuevo projecto
     os.chdir(DEFAULT_WORKSPACE_PATH)
     workspace_config_file = open(WORKSPACE_CONF_FILE, "a+b")
-    workspace_config_file.write(full_uri + "\n")
+    workspace_config_file.write(project_uri + "\n")
     workspace_config_file.close 
 
     # create the project object and return it
-    return Project(full_uri, project_name, language)
+    return Project(project_uri, project_name, language)
 
 def load_project_from_file(full_uri):
     project_file = open(os.path.join(full_uri, GIDET_PROJECT_CONF_FILE), "r")
@@ -66,7 +66,7 @@ def contains_project(uri):
 
 def all_projects2():
     os.chdir(DEFAULT_WORKSPACE_PATH)
-    config = open(WORKSPACE_CONF_FILE, "r")
+    config = open(WORKSPACE_CONF_FILE, "a+b")
 
     projects = [load_project_from_file(project_dir) \
             for project_dir \
@@ -92,11 +92,5 @@ def all_projects():
                 if os.path.isdir(os.path.join(workspace_uri, subdir))]
             if contains_project(project_dir)]
 
-#import projects
-#p = projects.new_project("testProject", "java", "/home/nny/Dropbox/PenDrive/#plugins/gedit/plugins/gIDEt/")
 
-#import projects
-#projects.all_projects2()
-
-#os.path.join("~/Dropbox/PenDrive/plugins/gedit/plugins/gIDEt/workspace/", "lala")
 
