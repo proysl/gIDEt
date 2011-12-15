@@ -32,7 +32,7 @@ RUBY_CONFIG = {
 
 PYTHON_CONFIG = {
   'plugins' : {
-    OPT_ACTIVE_PLUGINS : ['configmaster', 'codecomments', 'docinfo', 'modelines', 'filebrowser', 'spell', 'time', 'pythonconsole']
+    OPT_ACTIVE_PLUGINS : ['configmaster', 'codecomments', 'docinfo', 'modelines', 'filebrowser', 'pythonconsole', 'spell', 'time']
   },
   'preferences' : {
     'editor' : {

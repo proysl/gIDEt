@@ -22,6 +22,22 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
         pass
 
     ### PRIVATE - GSETTINGS ###
+    def _save_config(self, name):
+      RUBY_CONFIG = {
+        'plugins' : self._get_current_conf(ALL_PLUGINS, ".plugins"),
+        'preferences' : {
+          'editor' : self._get_current_conf(ALL_PREFERENCES_EDITOR, ".preferences.editor"),
+          'ui' : self._get_current_conf(ALL_PREFERENCES_UI, ".preferences.ui")
+         }
+       }
+      self._add_ui_for(name)
+
+    def _get_current_conf(self, items, gedit_schema):
+        current_config = {}
+        out_config = self._create_gedit_conf(gedit_schema)
+        for gname, gtype in items:
+          current_config[gname] = getattr(out_config, 'get_' + gtype)(gname)
+        return current_config
 
     def _set_current_profile(self, name):
         """Given a profile named 'name', take its configuration parameters and
@@ -80,6 +96,27 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
 
     ### PRIVATE - UI ###
 
+    def _add_ui_for(self, name):
+      ui_string = """<ui>
+  <menubar name="MenuBar">
+    <menu name="ViewsMenu" action="Views">
+      <menuitem name=\"""" + name + """Config" action=\"""" + name + """Config"/>
+    </menu>
+  </menubar>
+</ui>"""
+      manager = self.window.get_ui_manager()
+      act = Gtk.ActionGroup("ViewsMenuActions")
+      act.add_actions([('Views', None, 'ConfigMaster', None, "", None)])
+      manager.insert_action_group(act)
+      manager.ensure_update()
+      self._actions = Gtk.ActionGroup("ViewItemsActions")
+      self._actions.add_actions([
+          (name + "Config", Gtk.STOCK_INFO, "Choose " + name + " config",
+              None, "", self._config_selected)], name)
+      manager.insert_action_group(self._actions)
+      self._ui_merge_id = manager.add_ui_from_string(ui_string)
+      manager.ensure_update()
+        
     def _add_ui(self):
         manager = self.window.get_ui_manager()
         act = Gtk.ActionGroup("ViewsMenuActions")
@@ -93,12 +130,18 @@ class ConfigMaster(GObject.Object, Gedit.WindowActivatable):
         self._actions.add_actions([
             ('PythonConfig', Gtk.STOCK_INFO, "Choose _Python config",
                 None, "", self._config_selected)], 'python')
+        self._actions.add_actions([
+            ('SaveCurrent', Gtk.STOCK_INFO, "_Save Current",
+                None, "", self._save_current)], "custom01")
         manager.insert_action_group(self._actions)
         self._ui_merge_id = manager.add_ui_from_string(UI_XML)
         manager.ensure_update()
 
     def _config_selected(self, action, data=None):
         self._set_current_profile(data)
+    
+    def _save_current(self, action, data="custom01"):
+        self._save_config(data)
 
     def _remove_ui(self):
         manager = self.window.get_ui_manager()
